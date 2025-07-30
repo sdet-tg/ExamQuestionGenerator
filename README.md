@@ -28,14 +28,14 @@ exam-question-ui
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
-   cd exam-question-ui
+   git clone https://github.com/sdet-tg/ExamQuestionGenerator
+   cd ExamQuestionGenerator
    ```
 
 2. **Install dependencies**:
    It is recommended to use a virtual environment. You can create one using:
    ```bash
-   python -m venv venv
+   python3 -m venv venv
    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
    ```
    Then install the required packages:
@@ -46,7 +46,7 @@ exam-question-ui
 3. **Run the application**:
    Start the application by running:
    ```bash
-   python src/app.py
+   python3 src/app.py
    ```
    The application will be accessible at `http://127.0.0.1:5000`.
 
@@ -70,6 +70,31 @@ After generating questions, the following options are available:
 3. **Download Questions (HTML)**:
    - A "Download Questions (HTML)" button appears on the bottom-right corner of the screen.
    - Clicking this button downloads an HTML file containing the questions without the correct answers.
+
+## Exporting API Keys
+
+To use the application, you need to set up API keys for the AI models. Follow these steps:
+
+1. **Obtain API Keys**:
+   - Sign up for the respective AI services (e.g., OpenAI, Gemini, Mistral) and obtain your API keys.
+
+2. **Set Environment Variables**:
+   - Export the API keys as environment variables in your terminal session:
+     ```bash
+     export GEMINI_API_KEY="your_gemini_api_key"
+     export MISTRAL_API_KEY="your_mistral_api_key"
+     ```
+
+3. **Persist Environment Variables** (Optional):
+   - To make the environment variables persistent, add the export commands to your shell configuration file (e.g., `~/.zshrc` or `~/.bashrc`):
+     ```bash
+     echo 'export GEMINI_API_KEY="your_gemini_api_key"' >> ~/.zshrc
+     echo 'export MISTRAL_API_KEY="your_mistral_api_key"' >> ~/.zshrc
+     ```
+   - Reload the shell configuration:
+     ```bash
+     source ~/.zshrc
+     ```
 
 ## Contributing
 

@@ -47,26 +47,29 @@ def generate_exam_questions_gemini(className, topic, grade_level, num_questions=
     Here are some examples of what I'm looking for:
 
     If class is 'math', topic is 'Division' and grade is '12':
+
     [{{'question': "When the polynomial P(x) = 2x^4 - 3x^3 + ax^2 - 8x + 1 is divided by (x^2 + 1), the remainder is 3x - 5. What is the value of 'a'?",
     'type': 'short_answer', 'Correct Answer': '-2'}},
 
     {{'question': "When a polynomial P(x) is divided by (2x + 1), the quotient is (x^2 - 3x + 5) and the remainder is -4. Determine the original polynomial P(x).
-    'type': 'short_answer', 'Correct Answer': '2x^3 - 5x^2 + 7x + 1'}},
+    'type': 'short_answer', 'Correct Answer': '2x^3 - 5x^2 + 7x + 1'}}]
 
     If class is 'science', topic is biology and grade is '8':
+
     [{{'question': "Name the three essential ingredients (reactants) that plants need to perform photosynthesis.
     'type': 'short_answer', 'Correct Answer': 'Carbon dioxide, water, and sunlight (or light energy)'}},
 
     {{'question': "Describe how a significant decrease in the population of producers (like grass) in an ecosystem
     would likely affect the populations of herbivores and carnivores in that same ecosystem.",
-    'type': 'short_answer', 'Correct Answer': "A decrease in producers would lead to a decrease in the food available for herbivores,
-    causing their population to decline. Subsequently, with fewer herbivores available as food, the population of carnivores would also likely decrease due to lack of prey."
+    'type': 'short_answer', 'Correct Answer': "A decrease in producers would lead to a decrease in the food available for herbivores, causing their population to decline.
+    Subsequently, with fewer herbivores available as food, the population of carnivores would also likely decrease due to lack of prey."'}}]
 
     Now, generate {num_questions} questions for Grade {grade_level} on {topic} for {className} class.
     """
 
     try:
         response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        print(f"Response:\n{response}")
         # Split the response into individual questions
         questions = [q.strip() for q in response.text.split('\n\n') if q.strip()]
         
@@ -96,7 +99,7 @@ def generate_exam_questions_mistral(className, topic, grade_level, num_questions
     if not API_KEY:
         raise ValueError("MISTRAL_API_KEY environment variable not set. Please set your Mistral API key.")
 
-    client = mistral.Client()
+    client = Mistral(api_key=API_KEY)
 
     # Optimized prompt for Mistral AI
     prompt = f"""
@@ -115,27 +118,39 @@ def generate_exam_questions_mistral(className, topic, grade_level, num_questions
     
     Example:
     [
-        {
+        {{
             "question": "What is 12 x 7?",
             "type": "multiple_choice",
             "options": ["74", "84", "96", "68"],
             "correct_answer": "84"
-        },
-        {
+        }},
+        {{
             "question": "Explain the process of photosynthesis.",
             "type": "open_ended",
             "correct_answer": "Photosynthesis is the process by which green plants use sunlight to synthesize food from carbon dioxide and water."
-        }
+        }}
     ]
 
-    Generate the questions strictly in the specified JSON format without any additional text or explanations.
+    Return only the JSON array, do not include any explanations or markdown code block (like ```json).
     """
 
     try:
-        response = client.models.generate_content(model="mistral-1.0", contents=prompt)
-        # Parse the response into individual questions
-        questions = json.loads(response.text)
-        return questions[:num_questions]  # Return up to num_questions
+        response = client.chat.complete(model="mistral-large-latest", messages=[{"role": "user", "content": prompt}])
+        print(f"Response from Mistral: {response}")
+
+        # Access the content of the response
+        response_text = response.choices[0].message.content
+
+        # Validate and parse the response
+        try:
+            questions = json.loads(response_text)
+            if not isinstance(questions, list):
+                raise ValueError("Response is not a valid JSON array.")
+            return questions[:num_questions]  # Return up to num_questions
+        except json.JSONDecodeError as json_error:
+            print(f"JSON decoding error: {json_error}")
+            raise ValueError("Invalid JSON format received from Mistral.")
+
     except Exception as e:
         print(f"Error generating questions with Mistral: {e}")
         return []
@@ -149,17 +164,22 @@ def index():
         grade = data.get("gradeLevel", 0)
         count = data.get("numQuestions", 0)
         difficulty = data.get("difficulty", "medium")
-        platform = data.get("platform", "gemini")
-        print(f"Received query for className={className}, topic={topic}, grade={grade}, count={count}, difficulty={difficulty}")
-        if platform == "mistral":
+        aiModel = data.get("aiModel", "gemini")
+        print(f"Received query for className={className}, topic={topic}, grade={grade}, count={count}, difficulty={difficulty}, aiModel={aiModel}")
+
+        if aiModel == "mistral":
             questions = generate_exam_questions_mistral(className, topic, grade, count, difficulty)
-        else:
-            questions = generate_exam_questions_gemini(className, topic, grade, count, difficulty)
-        print(f"Response:\n{questions}")
+            print(f"Parsed:\n{questions}")
+            return questions
+
+        questions = generate_exam_questions_gemini(className, topic, grade, count, difficulty)
         try:
             parsed_json = json.loads(questions[0])
         except json.JSONDecodeError as e:
             return jsonify({"error": "Failed to parse AI response", "details": str(e)}), 400
+        except IndexError:
+            return jsonify({"error": "No questions generated"}), 400
+            
         print(f"Parsed:\n{parsed_json}")
         return parsed_json
 
