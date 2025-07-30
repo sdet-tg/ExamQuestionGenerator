@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Question Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Exam Question Generator</h1>
+        <form id="questionForm">
+            <label for="className">Class:</label>
+            <input type="text" id="className" name="className" required  placeholder="e.g., Math">
+
+            <label for="topic">Topic:</label>
+            <input type="text" id="topic" name="topic" required  placeholder="e.g., Rational Numbers">
+
+            <label for="gradeLevel">Grade Level:</label>
+            <input type="number" id="gradeLevel" name="gradeLevel" min="1" max="12" required placeholder="1 to 12">
+
+            <label for="difficulty">Difficulty Level:</label>
+            <select id="difficulty" name="difficulty" required>
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+
+            <label for="numQuestions">Number of Questions:</label>
+            <input type="number" id="numQuestions" name="numQuestions" min="1" max="100" value="10" required>
+
+            <label for="aiModel">AI Model:</label>
+            <select id="aiModel" name="aiModel" required>
+                <option value="gemini">Gemini</option>
+                <option value="mistral">Mistral</option>
+            </select>
+
+            <button type="submit">Generate Questions</button>
+        </form>
+
+        <div id="questionsList" aria-live="polite">
+            <!-- Dynamic questions will appear here -->
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
