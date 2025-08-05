@@ -8,18 +8,19 @@ This project is a web application that allows users to generate exam questions b
 exam-question-ui
 ├── src
 │   ├── app.py                # Main application file that sets up the web server and handles user input
+│   ├── static
+│   |   ├── css
+│   |   │   └── styles.css    # CSS styles for the UI
+│   |   └── js
+│   |       └── scripts.js     # JavaScript for client-side interactivity
 │   ├── templates
 │   │   └── index.html        # HTML structure for the user interface
-│   ├── utils                 # Utility scripts for additional functionality
-│   │   ├── claude_test.py    # Test script for Claude AI
-│   │   ├── gemini_test.py    # Test script for Gemini AI
-│   │   ├── mistral_test.py   # Test script for Mistral AI
-│   │   └── openai_test.py    # Test script for OpenAI ChatGPT
-│   └── static
-│       ├── css
-│       │   └── styles.css    # CSS styles for the UI
-│       └── js
-│           └── scripts.js     # JavaScript for client-side interactivity
+│   └── utils                 # Utility scripts for additional functionality
+│       ├── claude_test.py    # Test script for Claude AI
+│       ├── gemini_test.py    # Test script for Gemini AI
+│       ├── mistral_test.py   # Test script for Mistral AI
+│       └── openai_test.py    # Test script for OpenAI ChatGPT
+
 ├── requirements.txt           # Python dependencies required for the project
 └── README.md                  # Documentation for the project
 ```
